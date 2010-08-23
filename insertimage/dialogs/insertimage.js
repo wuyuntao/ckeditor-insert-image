@@ -4,10 +4,7 @@ CKEDITOR.dialog.add('insertimage', function(editor) {
     // Load image preview.
     var IMAGE = 1,
         PREVIEW = 4,
-        CLEANUP = 8,
-        regexGetSize = /^\s*(\d+)((px)|\%)?\s*$/i,
-        regexGetSizeOrEmpty = /(^\s*(\d+)((px)|\%)?\s*$)|^$/i,
-        pxLengthRegex = /^\d+px$/;
+        CLEANUP = 8;
 
     var updatePreview = function(dialog) {
         // Don't load before onShow.
@@ -58,15 +55,15 @@ CKEDITOR.dialog.add('insertimage', function(editor) {
                 return 'cke_' + (++last) + '_' + id;
             }
         })(),
-        previewLoaderId = numbering('insertimage-preview-loader'),
-        previewBoxId = numbering('insertimage-preview-box'),
-        previewImageId = numbering('insertimage-preview-image'),
-        previewTextId = numbering('insertimage-preview-text');
+        previewLoaderId = numbering('insertimage_preview_loader'),
+        previewBoxId = numbering('insertimage_preview_box'),
+        previewImageId = numbering('insertimage_preview_image'),
+        previewTextId = numbering('insertimage_preview_text');
 
     return {
         title: editor.lang.image.title,
         minWidth: 420,
-        minHeight: 310,
+        minHeight: 240,
         onShow: function() {
             this.imageElement = false;
 
@@ -109,9 +106,10 @@ CKEDITOR.dialog.add('insertimage', function(editor) {
             }
 
             // Dont show preview if no URL given.
-            if (!CKEDITOR.tools.trim(this.getValueOf('info', 'txtUrl'))) {
+            if (!CKEDITOR.tools.trim(this.getValueOf('info', 'url'))) {
                 this.preview.removeAttribute('src');
                 this.preview.setStyle('display', 'none');
+                this.previewText.setAttribute('display', 'block');
             }
         },
         onOk: function() {
@@ -166,7 +164,7 @@ CKEDITOR.dialog.add('insertimage', function(editor) {
                 accessKey: 'I',
                 elements: [
                     {
-                        id: 'txtUrl',
+                        id: 'url',
                         type: 'text',
                         label: editor.lang.common.url,
                         required: true,
@@ -185,8 +183,7 @@ CKEDITOR.dialog.add('insertimage', function(editor) {
                                 original.setCustomData('isReady', 'false');
                                 // Show loader
                                 var loader = CKEDITOR.document.getById(previewLoaderId);
-                                if (loader)
-                                    loader.setStyle('display', '');
+                                if (loader) loader.setStyle('display', '');
 
                                 original.on('load', onImgLoadEvent, dialog);
                                 original.on('error', onImgLoadErrorEvent, dialog);
@@ -197,10 +194,12 @@ CKEDITOR.dialog.add('insertimage', function(editor) {
                                 previewPreloader.setAttribute('src', newUrl);
                                 dialog.preview.setAttribute('src', previewPreloader.$.src);
                                 updatePreview(dialog);
+                                dialog.previewText.setStyle('display', 'none');
                             } else if (dialog.preview) {
                                 // Dont show preview if no URL given.
                                 dialog.preview.removeAttribute('src');
                                 dialog.preview.setStyle('display', 'none');
+                                dialog.previewText.setStyle('display', 'block');
                             }
                         },
                         setup: function(type, element) {
@@ -208,7 +207,8 @@ CKEDITOR.dialog.add('insertimage', function(editor) {
                                 var url = element.getAttribute('_cke_saved_src') || element.getAttribute('src');
                                 var field = this;
 
-                                field.setValue(url);        // And call this.onChange()
+                                // And call this.onChange()
+                                field.setValue(url);
                                 // Manually set the initial value.(#4191)
                                 field.setInitValue();
                                 field.focus();
@@ -227,10 +227,10 @@ CKEDITOR.dialog.add('insertimage', function(editor) {
                     },
                     {
                         type: 'html',
-                        html: '<div><div id="' + previewLoaderId + '" class="insertimage-preview-loader" style="display:none"><div class="loading">&nbsp;</div></div>'+
-                            '<div id="' + previewBoxId + '" class="insertimage-preview-box">'+
-                            '<img id="' + previewImageId + '" alt="" class="insertimage-preview-image" />' +
-                            '<p id="' + previewTextId + '" class="insertimage-preview-text">' + editor.lang.insertimage.previewText + '</p>' +
+                        html: '<div><div id="' + previewLoaderId + '" class="insertimage_preview_loader" style="display:none"><div class="loading">&nbsp;</div></div>'+
+                            '<div id="' + previewBoxId + '" class="insertimage_preview_box">'+
+                            '<img id="' + previewImageId + '" alt="" class="insertimage_preview_image" />' +
+                            '<p id="' + previewTextId + '" class="insertimage_preview_text">' + editor.lang.insertimage.previewText + '</p>' +
                             '</div></div>'
                     }
                 ]

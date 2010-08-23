@@ -23,6 +23,17 @@ CKEDITOR.plugins.add('insertimage', {
                 e.data.dialog = 'insertimage';
             }
         });
+
+        if (editor.addMenuItems) {
+            editor.addMenuItems({
+                image: {
+                    label : editor.lang.image.menu,
+                    command : 'insertimage',
+                    group : 'image',
+                    order : 1
+                }
+            });
+        }
     }
 });
 
